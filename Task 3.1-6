@@ -1,0 +1,13 @@
+#include <iostream>
+using namespace std;
+
+int main()
+{
+    setlocate(0, "");
+    int n;
+    cout << "Введите значение n";
+    cin >> n
+    int s n/n+1
+    cout << "" << s << endl;
+    return 0;
+}
