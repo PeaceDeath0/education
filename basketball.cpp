@@ -1,125 +1,212 @@
 #include <iostream>
-#include <fstream>
 #include <string>
-#include <vector>
+#include <fstream>
+#include <stdio.h>
 
-using namespace std;
+int teamA[6];
+int teamB[6]; // массивы для хранения сторон команд
 
-int team1[4] = {1, 5, 10, 8};
-int team2[4] = {12, 8, 9, 1};
+int partScoreA = 0;
+int partScoreB = 0; //счет партии
 
-vector<pair<int, int>> score = {{0, 0}};
+int scoreA = 0;
+int scoreB = 0; //счет (в общем)
 
-int* current_team = team1;
+int lastGoal = 0;
 
-void print_team() {
-    cout << "Team: ";
-    for (int i = 0; i < 4; i++) {
-        cout << current_team[i] << " ";
-    }
-    cout << endl;
+std::ofstream logg;
+
+
+void logs(std::string message)
+{
+    logg.open("log.txt", std::ofstream::app);
+    logg << message << std::endl;
+    logg.close();
 }
 
-void change_team(bool is_team1_win) {
-    if (is_team1_win) {
-        current_team = team1;
-    } else {
-        current_team = team2;
-    }
-    print_team();
+void reverse(int arra1[6]) //функция для перехода
+{
+    int buffer1 = arra1[5];
+    arra1[5] = arra1[4];
+    arra1[4] = arra1[3];
+    arra1[3] = arra1[2];
+    arra1[2] = arra1[1];
+    arra1[1] = arra1[0];
+    arra1[0] = buffer1;
+
 }
 
-void change_score(char action, int player) {
-    bool is_player_valid = false;
-    for (int i = 0; i < 4; i++) {
-        if (current_team[i] == player) {
-            is_player_valid = true;
-            break;
-        }
+void graphic(int arra1[6], int arra2[6]) //функция для отображения поля
+{
+    std::cout << "\n\nScore A: " << scoreA << "(" << partScoreA << ")" << "  Score A: " << scoreB << "(" << partScoreB << ")\n\n";
+    std::cout << "      " << arra1[2] << "  " << arra1[3] << "  |  " << arra2[5] << "  " << arra2[0] << "(P)\n";
+    std::cout << "      " << arra1[1] << "  " << arra1[4] << "  |  " << arra2[4] << "  " << arra2[1] << "\n";
+    std::cout << "   (P)" << arra1[0] << "  " << arra1[5] << "  |  " << arra2[3] << "  " << arra2[2] << "\n\n";
+}
+
+void startGame(int arra1[6], int arra2[6]) //функция для ввода команд
+{
+    logs("Game was started!"); // std::to_string(5) для приписывания
+
+    std::cout << "Enter command A" << "\n";
+
+    for (int i = 0; i < 6; i++)
+    {
+        std::cout << "Player " << i + 1 << ": ";
+        std::cin >> arra1[i];
     }
-    if (!is_player_valid) {
+
+    std::cout << "Enter command B" << "\n";
+
+    for (int i = 0; i < 6; i++)
+    {
+        std::cout << "Player " << i + 1 << ": ";
+        std::cin >> arra2[i];
+    }
+}
+
+void action(int* lastGoal, int* partScoreA, int* partScoreB) //функция действия
+{
+    std::string teamAction;
+    int playerAction;
+    std::string whatAction;
+
+    logg.open("log.txt", std::ofstream::app);
+
+    std::cout << "which team performed the action?(a or b)\n";
+    std::cin >> teamAction;
+
+    if (teamAction != "a" && teamAction != "b")
+    {
+        std::cout << "You choose wrong team, please retry\n";
         return;
     }
 
-    if (action == 'A') { 
-        score.back().first++;
-    } else if (action == 'B') { 
-        score.back().second++;
-    } else if (action == 'P') { 
-       
-    } else if (action == 'O') { 
-        score.back().second++;
-    }
+    std::cout << "\nwhat action was performed?\n";
+    std::cout << "a - Attack; b - Block, p - Supply, o - Error (P.S. Please, don't write anything except a, b, p, or o) \n";
+    std::cin >> whatAction;
 
-    if (score.back().first >= 25 && score.back().first - score.back().second >= 2) {
-        score.push_back(make_pair(0, 0));
-    }
-
-    cout << "Score: " << score.size() << " (" << score.back().first << ") - " 
-    << score.size() - 1 << " (" << score.back().second << ")" << endl;
-}
-
-void replace_player(int leaving_player, int entering_player) {
-
-    int leaving_player_index = -1;
-    for (int i = 0; i < 4; i++) {
-        if (current_team[i] == leaving_player) {
-            leaving_player_index = i;
-            break;
-        }
-    }
-    if (leaving_player_index == -1) {
+    if (whatAction != "a" && whatAction != "b" && whatAction != "p" && whatAction != "o")
+    {
+        std::cout << "You choose wrong action, please retry\n";
         return;
     }
 
-    current_team[leaving_player_index] = entering_player;
-    print_team();
-}
+    if (whatAction != "o")
+    {
+        std::cout << "which player performed the action?(player's position number)\n";
+        std::cin >> playerAction;
 
-int main() {
-    cout << "Starting match" << endl;
-    cout << "Team 1: "; print_team();
-    cout << "Team 2: "; print_team();
-    cout << "Score: 1 (0) - 0 (0)" << endl;
-
-    ofstream log_file;
-    log_file.open("logs.txt");
-
-    while (true) {
-        char action;
-        int player;
-        cout << "Enter action and player number (ex. \"A 10\"): ";
-        cin >> action >> player;
-
-        log_file << action << " " << player << endl;
-
-
-        if (action == 'A' || action == 'B' || action == 'P' || action == 'O') {
-            change_score(action, player);
-        } else if (action == 'R') { 
-            int entering_player;
-            cout << "Enter entering player number: ";
-            cin >> entering_player;
-            replace_player(player, entering_player);
-            log_file << "R " << player << " " << entering_player << endl;
+        if (playerAction <= 0 or playerAction >= 7)
+        {
+            std::cout << "You choose wrong player place number, please retry\n";
+            return;
         }
 
-        if (score.size() > 3 || (score.size() == 3 && (score.back().first >= 15 || score.back().second >= 15))) {
-            cout << "Match is over!" << endl;
-            cout << "Final score: " << score.size() - 1 << " - " << score.back().second << endl;
-            ofstream db_file("db.txt", i
-os_base::app);
-            db_file << score.size() - 1 << " - " << score.back().second << endl;
-            break;
-        } else { 
-            bool is_team1_win;
-            cout << "Enter winning team (A/B): ";
-            cin >> is_team1_win;
-            change_team(is_team1_win);
+        if (teamAction == "a")
+        {
+            logg << "Player from team A got a point!" << std::endl;
         }
+        if (teamAction == "b")
+        {
+            logg << "Player from team B got a point!" << std::endl;
+        }
+
+
+        if (teamAction == "a")
+        {
+            if (*lastGoal == 2) { reverse(teamA);  logg << "Team A reverse!" << std::endl; }
+
+            *lastGoal = 1;
+            *partScoreA += 1;
+        }
+
+        if (teamAction == "b")
+        {
+            if (*lastGoal == 1) { reverse(teamB);  logg << "Team B reverse!" << std::endl; }
+
+            *lastGoal = 2;
+            *partScoreB += 1;
+        }
+        
     }
 
-    log_file.close();
+    logg.close();
+}
 
-    return 0;
+void scorePlus(int* partScoreA, int* partScoreB, int* scoreA, int* scoreB) //функция меняющая очки партий
+{
+    if (*partScoreA == 25) { *partScoreA = 0; *scoreA += 1; }
+    if (*partScoreB == 25) { *partScoreB = 0; *scoreB += 1; }
+}
+
+void playerReplace(int arra1[6], int arra2[6]) //функция замены
+{
+    std::string team;
+    int playerPlace;
+    int playerNum;
+
+    std::cout << "which team?\n";
+    std::cin >> team;
+
+    if (team != "a" && team != "b")
+    {
+        std::cout << "You choose wrong team, please retry\n";
+        return;
+    }
+
+    std::cout << "which player?(player's position number)\n";
+    std::cin >> playerPlace;
+
+    if (playerPlace <= 0 or playerPlace >= 7)
+    {
+        std::cout << "You choose wrong player place number, please retry\n";
+        return;
+    }
+
+    std::cout << "which player to replace?(player number\n";
+    std::cin >> playerNum;
+
+    if (team == "a") arra1[playerPlace - 1] = playerNum;
+    if (team == "b") arra2[playerPlace - 1] = playerNum;
+
+}
+
+int main()
+{
+    startGame(teamA, teamB);
+
+    logg.open("log.txt", std::ofstream::app);
+
+    while (true)
+    {
+        graphic(teamA, teamB);
+        int choose;
+        std::cout << "what do you want to do?\n";
+        std::cout << "1 - Replace Player, 2 - Action\n";
+
+        std::cin >> choose;
+
+        if (choose == 1 or choose == 2) {
+            switch (choose)
+            {
+            case(1):
+                choose = 3;
+                playerReplace(teamA, teamB);
+                break;
+            case(2):
+                choose = 3;
+                action(&lastGoal, &partScoreA, &partScoreB);
+                break;
+            default:
+                choose = 3;
+                break;
+            }
+        }
+
+        scorePlus(&partScoreA, &partScoreB, &scoreA, &scoreB);
+
+        if (scoreA == 3) { std::cout << "Team A win!\n"; logg << "Team A win!" << std::endl; logg.close();  break; }
+        if (scoreB == 3) { std::cout << "Team B win!\n"; logg << "Team B win!" << std::endl; logg.close();  break; }
+    }
 }
