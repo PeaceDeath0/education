@@ -4,13 +4,13 @@
 #include <stdio.h>
 
 int teamA[6];
-int teamB[6]; // массивы для хранения сторон команд
+int teamB[6];
 
 int partScoreA = 0;
-int partScoreB = 0; //счет партии
+int partScoreB = 0;
 
 int scoreA = 0;
-int scoreB = 0; //счет (в общем)
+int scoreB = 0; 
 
 int lastGoal = 0;
 
@@ -24,7 +24,7 @@ void logs(std::string message)
     logg.close();
 }
 
-void reverse(int arra1[6]) //функция для перехода
+void reverse(int arra1[6]) 
 {
     int buffer1 = arra1[5];
     arra1[5] = arra1[4];
@@ -36,7 +36,7 @@ void reverse(int arra1[6]) //функция для перехода
 
 }
 
-void graphic(int arra1[6], int arra2[6]) //функция для отображения поля
+void graphic(int arra1[6], int arra2[6]) 
 {
     std::cout << "\n\nScore A: " << scoreA << "(" << partScoreA << ")" << "  Score A: " << scoreB << "(" << partScoreB << ")\n\n";
     std::cout << "      " << arra1[2] << "  " << arra1[3] << "  |  " << arra2[5] << "  " << arra2[0] << "(P)\n";
@@ -44,9 +44,9 @@ void graphic(int arra1[6], int arra2[6]) //функция для отображ�
     std::cout << "   (P)" << arra1[0] << "  " << arra1[5] << "  |  " << arra2[3] << "  " << arra2[2] << "\n\n";
 }
 
-void startGame(int arra1[6], int arra2[6]) //функция для ввода команд
+void startGame(int arra1[6], int arra2[6]) 
 {
-    logs("Game was started!"); // std::to_string(5) для приписывания
+    logs("Game was started!"); 
 
     std::cout << "Enter command A" << "\n";
 
@@ -65,7 +65,7 @@ void startGame(int arra1[6], int arra2[6]) //функция для ввода к
     }
 }
 
-void action(int* lastGoal, int* partScoreA, int* partScoreB) //функция действия
+void action(int* lastGoal, int* partScoreA, int* partScoreB)
 {
     std::string teamAction;
     int playerAction;
@@ -128,19 +128,19 @@ void action(int* lastGoal, int* partScoreA, int* partScoreB) //функция д
             *lastGoal = 2;
             *partScoreB += 1;
         }
-        
+
     }
 
     logg.close();
 }
 
-void scorePlus(int* partScoreA, int* partScoreB, int* scoreA, int* scoreB) //функция меняющая очки партий
+void scorePlus(int* partScoreA, int* partScoreB, int* scoreA, int* scoreB)
 {
     if (*partScoreA == 25) { *partScoreA = 0; *scoreA += 1; }
     if (*partScoreB == 25) { *partScoreB = 0; *scoreB += 1; }
 }
 
-void playerReplace(int arra1[6], int arra2[6]) //функция замены
+void playerReplace(int arra1[6], int arra2[6]) 
 {
     std::string team;
     int playerPlace;
@@ -191,17 +191,16 @@ int main()
             switch (choose)
             {
             case(1):
-                choose = 3;
                 playerReplace(teamA, teamB);
                 break;
             case(2):
-                choose = 3;
                 action(&lastGoal, &partScoreA, &partScoreB);
                 break;
-            default:
-                choose = 3;
-                break;
+
             }
+        } 
+        else {
+            break;
         }
 
         scorePlus(&partScoreA, &partScoreB, &scoreA, &scoreB);
