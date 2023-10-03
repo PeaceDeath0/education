@@ -1,78 +1,103 @@
 #include <iostream>
 #include <vector>
 
-struct Deposit {
+using namespace std;
+
+struct Payout {
     double amount;
-    int term;
-    double interestRate;
-    double taxRate;
-    int paymentPeriod;
-    bool interestCapitalization;
-    std::vector<double> additions;
-    std::vector<double> partialWithdrawals;
+    int duration;
 };
 
-double calculateInterest(double amount, double interestRate, int term, int paymentPeriod, bool interestCapitalization) {
-    double totalInterest = 0;
-    double currentAmount = amount;
-    
-    for (int i = 0; i < term; i += paymentPeriod) {
-        double interest = currentAmount * (interestRate / 100);
-        
-        if (interestCapitalization) {
-            currentAmount += interest;
-        } else {
-            currentAmount += interest * paymentPeriod;
+struct Withdrawal {
+    double amount;
+    int duration;
+};
+
+double calculateInterest(double depositAmount, double interestRate, int duration, bool capitalization) {
+    double interest = 0;
+    if (capitalization) {
+        for (int i = 0; i < duration; i++) {
+            interest += depositAmount * interestRate / 100;
+            depositAmount += interest;
         }
-        
-        totalInterest += interest;
+    } else {
+        interest = depositAmount * interestRate / 100 * duration;
     }
-    
-    return totalInterest;
+    return interest;
 }
 
-double calculateTax(double interest, double taxRate) {
-    return interest * (taxRate / 100);
+double calculateTax(double interestAmount, double taxRate) {
+    return interestAmount * taxRate / 100;
 }
 
-double calculateTotalAmount(Deposit deposit) {
-    double totalAmount = deposit.amount;
-    double interest = calculateInterest(
-        deposit.amount, deposit.interestRate, deposit.term, deposit.paymentPeriod, deposit.interestCapitalization);
-    double tax = calculateTax(interest, deposit.taxRate);
-    
-    totalAmount += interest - tax;
-    
-    for (double addition : deposit.additions) {
-        totalAmount += addition;
+double calculateTotalAmount(double depositAmount, double interestAmount, double taxAmount, vector<Payout>& payouts, vector<Withdrawal>& withdrawals) {
+    double totalAmount = depositAmount + interestAmount - taxAmount;
+
+    for (auto& payout : payouts) {
+        if (payout.duration <= 0) {
+            totalAmount += payout.amount;
+        }
     }
-    
-    for (double withdrawal : deposit.partialWithdrawals) {
-        totalAmount -= withdrawal;
+
+    for (auto& withdrawal : withdrawals) {
+        if (withdrawal.duration <= 0) {
+            totalAmount -= withdrawal.amount;
+        }
     }
-    
+
     return totalAmount;
 }
 
 int main() {
-    Deposit deposit;
-    deposit.amount = 10000;
-    deposit.term = 12;
-    deposit.interestRate = 5;
-    deposit.taxRate = 13;
-    deposit.paymentPeriod = 1;
-    deposit.interestCapitalization = true;
-    deposit.additions = {500, 1000};
-    deposit.partialWithdrawals = {300};
-    
-    double interest = calculateInterest(
-        deposit.amount, deposit.interestRate, deposit.term, deposit.paymentPeriod, deposit.interestCapitalization);
-    double tax = calculateTax(interest, deposit.taxRate);
-    double totalAmount = calculateTotalAmount(deposit);
-    
-    std::cout << "Accrued interest: " << interest << std::endl;
-    std::cout << "Tax amount: " << tax << std::endl;
-    std::cout << "Total amount at the end of term: " << totalAmount << std::endl;
-    
+    double depositAmount, interestRate, taxRate;
+    int duration;
+    bool capitalization;
+    int payoutCount, withdrawalCount;
+
+    cout << "Введите сумму вклада: ";
+    cin >> depositAmount;
+
+    cout << "Введите процентную ставку: ";
+    cin >> interestRate;
+
+    cout << "Введите срок размещения (в годах): ";
+    cin >> duration;
+
+    cout << "Введите налоговую ставку: ";
+    cin >> taxRate;
+
+    cout << "Будет ли процентная ставка капитализироваться (1 - да, 0 - нет): ";
+    cin >> capitalization;
+
+    cout << "Введите количество выплат: ";
+    cin >> payoutCount;
+
+    vector<Payout> payouts(payoutCount);
+    for (int i = 0; i < payoutCount; i++) {
+        cout << "Введите сумму выплаты " << i + 1 << ": ";
+        cin >> payouts[i].amount;
+        cout << "Введите длительность выплаты " << i + 1 << ": ";
+        cin >> payouts[i].duration;
+    }
+
+    cout << "Введите количество частичных снятий: ";
+    cin >> withdrawalCount;
+
+    vector<Withdrawal> withdrawals(withdrawalCount);
+    for (int i = 0; i < withdrawalCount; i++) {
+        cout << "Введите сумму снятия " << i + 1 << ": ";
+        cin >> withdrawals[i].amount;
+        cout << "Введите длительность снятия " << i + 1 << ": ";
+        cin >> withdrawals[i].duration;
+    }
+
+    double interestAmount = calculateInterest(depositAmount, interestRate, duration, capitalization);
+    double taxAmount = calculateTax(interestAmount, taxRate);
+    double totalAmount = calculateTotalAmount(depositAmount, interestAmount, taxAmount, payouts, withdrawals);
+
+    cout << "Начисленные проценты: " << interestAmount << endl;
+    cout << "Сумма налога: " << taxAmount << endl;
+    cout << "Сумма на вкладе к концу срока: " << totalAmount << endl;
+
     return 0;
 }
