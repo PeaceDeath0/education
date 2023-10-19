@@ -1,37 +1,38 @@
 #include <iostream>
-#include <cstring>
 
 int main() {
-    // Вводим 100 значных чисел через массив типа char
-    char buffer[101];
-    std::cout << "Введите 100 значных чисел:\n";
-    std::cin.getline(buffer, sizeof(buffer));
-    
-    // Массив типа int для хранения преобразованных чисел
-    int numbers[100];
-    
-    // Преобразуем строки во входном буфере в числа типа int
-    for (int i = 0; i < 100; i++) {
-        std::string numberString(&buffer[i*100], &buffer[i*100] + 100);
-        numbers[i] = std::stoi(numberString);
+    const int SIZE = 3;
+
+    // Ввод чисел
+    int buffer[SIZE];
+    for (int i = 0; i < SIZE; i++) {
+        std::cout << "Введите число: ";
+        std::cin >> buffer[i];
     }
-    
-    // Выводим сумму и разность чисел
+
+    // Вывод массива типа int
+    std::cout << "Массив чисел: ";
+    for (int i = 0; i < SIZE; i++) {
+        std::cout << buffer[i] << " ";
+    }
+    std::cout << std::endl;
+
+    // Вычисление сложения и вычитания
     int sum = 0;
-    int diff = numbers[0];
-    for (int i = 1; i < 100; i++) {
-        sum += numbers[i];
-        diff -= numbers[i];
+    int difference = buffer[0];
+    for (int i = 1; i < SIZE; i++) {
+        sum += buffer[i];
+        difference -= buffer[i];
     }
     std::cout << "Сумма чисел: " << sum << std::endl;
-    std::cout << "Разность чисел: " << diff << std::endl;
-    
-    // Выводим произведение чисел
-    long long product = 1;
-    for (int i = 0; i < 100; i++) {
-        product *= numbers[i];
+    std::cout << "Разность чисел: " << difference << std::endl;
+
+    // Вычисление умножения
+    int product = buffer[0];
+    for (int i = 1; i < SIZE; i++) {
+        product *= buffer[i];
     }
     std::cout << "Произведение чисел: " << product << std::endl;
-    
+
     return 0;
 }
