@@ -1,38 +1,48 @@
 #include <iostream>
+using namespace std;
 
-int main() {
-    const int SIZE = 3;
+int main()
+{
+    // Создаем массив для хранения чисел
+    int numbers[3];
 
-    // Ввод чисел
-    int buffer[SIZE];
-    for (int i = 0; i < SIZE; i++) {
-        std::cout << "Введите число: ";
-        std::cin >> buffer[i];
+    // Вводим значения для массива
+    cout << "Введите три 3-х значных числа: ";
+    for (int i = 0; i < 3; i++)
+    {
+        cin >> numbers[i];
     }
 
-    // Вывод массива типа int
-    std::cout << "Массив чисел: ";
-    for (int i = 0; i < SIZE; i++) {
-        std::cout << buffer[i] << " ";
+    // Выводим массив типа int
+    cout << "Массив: ";
+    for (int i = 0; i < 3; i++)
+    {
+        cout << numbers[i] << " ";
     }
-    std::cout << std::endl;
+    cout << endl;
 
-    // Вычисление сложения и вычитания
+    // Выполняем сложение и вычитание чисел
     int sum = 0;
-    int difference = buffer[0];
-    for (int i = 1; i < SIZE; i++) {
-        sum += buffer[i];
-        difference -= buffer[i];
+    int difference = numbers[0];
+    for (int i = 1; i < 3; i++)
+    {
+        sum += numbers[i];
+        difference -= numbers[i];
     }
-    std::cout << "Сумма чисел: " << sum << std::endl;
-    std::cout << "Разность чисел: " << difference << std::endl;
 
-    // Вычисление умножения
-    int product = buffer[0];
-    for (int i = 1; i < SIZE; i++) {
-        product *= buffer[i];
+    // Выводим результаты
+    cout << "Сумма чисел: " << sum << endl;
+    cout << "Разность чисел: " << difference << endl;
+
+    // Выполняем умножение чисел
+    int multiplication = 1;
+    for (int i = 0; i < 3; i++)
+    {
+        multiplication *= numbers[i];
     }
-    std::cout << "Произведение чисел: " << product << std::endl;
+
+    // Выводим результат умножения
+    cout << "Умножение чисел: " << multiplication << endl;
 
     return 0;
 }
