@@ -4,14 +4,14 @@
 #include <algorithm>
 
 int main() {
-    std::map<std::string, int> pizzaVisits = {
-        {"PizzaHut", 15},
-        {"Dominos", 20},
-        {"PapaJohns", 25},
-        {"LittleCaesars", 30}
+    std::map<std::string, std::vector<std::string>> pizzaMenu = {
+        {"PizzaHut", {"Margherita", "Pepperoni", "Vegetarian"}},
+        {"Dominos", {"Pepperoni", "Supreme", "Hawaiian"}},
+        {"PapaJohns", {"Pepperoni", "Hawaiian", "Meat Lovers"}},
+        {"LittleCaesars", {"Cheese", "Sausage", "Pepperoni"}}
     };
 
-    std::map<std::string, std::string> pizzaGender = {
+    std::map<std::string, std::string> pizzaVisitors = {
         {"PizzaHut", "female"},
         {"Dominos", "male"},
         {"PapaJohns", "female"},
@@ -29,61 +29,74 @@ int main() {
         {"Margherita", 10.0},
         {"Pepperoni", 12.0},
         {"Vegetarian", 11.0},
-        {"Supreme", 13.0}
+        {"Supreme", 13.0},
+        {"Hawaiian", 12.0},
+        {"Meat Lovers", 14.0},
+        {"Cheese", 9.0},
+        {"Sausage", 11.0}
     };
 
-    std::vector<std::string> femaleVisits;
-    std::vector<std::string> maleVisits;
+    std::map<std::string, int> maleVisits;
+    std::map<std::string, int> femaleVisits;
     std::vector<std::string> andreyVisitsNoOrder;
     std::vector<std::string> differentPrices;
 
-    for (auto it = pizzaVisits.begin(); it != pizzaVisits.end(); ++it) {
-        if (pizzaGender[it->first] == "female") {
-            femaleVisits.push_back(it->first);
+    for (const auto& entry : pizzaVisitors) {
+        if (entry.second == "male") {
+            maleVisits[entry.first]++;
         } else {
-            maleVisits.push_back(it->first);
+            femaleVisits[entry.first]++;
         }
     }
 
-    std::sort(femaleVisits.begin(), femaleVisits.end());
-    std::sort(maleVisits.begin(), maleVisits.end());
-
-    std::set_intersection(
-        femaleVisits.begin(), femaleVisits.end(),
-        maleVisits.begin(), maleVisits.end(),
-        std::back_inserter(andreyVisitsNoOrder)
-    );
-
-    for (auto it = pizzaOrders.begin(); it != pizzaOrders.end(); ++it) {
-        if (it->second == false) {
-            andreyVisitsNoOrder.push_back(it->first);
+    std::vector<std::string> maleOnlyVisits;
+    std::vector<std::string> femaleOnlyVisits;
+    for (const auto& entry : maleVisits) {
+        if (femaleVisits.find(entry.first) == femaleVisits.end()) {
+            maleOnlyVisits.push_back(entry.first);
+        }
+    }
+    for (const auto& entry : femaleVisits) {
+        if (maleVisits.find(entry.first) == maleVisits.end()) {
+            femaleOnlyVisits.push_back(entry.first);
         }
     }
 
-    for (auto it = pizzaPrices.begin(); it != pizzaPrices.end(); ++it) {
-        auto found = std::adjacent_find(pizzaPrices.begin(), pizzaPrices.end(), 
+    for (const auto& entry : pizzaOrders) {
+        if (entry.second == false) {
+            andreyVisitsNoOrder.push_back(entry.first);
+        }
+    }
+
+    for (const auto& entry : pizzaPrices) {
+        auto it = entry;
+        auto found = std::find_if(pizzaPrices.begin(), pizzaPrices.end(),
             [it](const std::pair<std::string, float>& p) {
-                return it->second != p.second;
+                return it.second != p.second;
             });
-
         if (found != pizzaPrices.end()) {
-            differentPrices.push_back(it->first);
+            differentPrices.push_back(it.first);
         }
     }
 
-    std::cout << "Pizzerias visited by more women: ";
-    for (const auto& pizzeria : femaleVisits) {
-        std::cout << pizzeria << " ";
-    }
-    std::cout << std::endl;
-
-    std::cout << "Pizzerias visited by more men: ";
-    for (const auto& pizzeria : maleVisits) {
-        std::cout << pizzeria << " ";
+    std::cout << "Pizzerias visited more by women: ";
+    for (const auto& entry : femaleVisits) {
+        if (entry.second > maleVisits[entry.first]) {
+            std::cout << entry.first << " ";
+        }
     }
     std::cout << std::endl;
 
     std::cout << "Pizzerias visited only by women or men: ";
+    for (const auto& pizzeria : femaleOnlyVisits) {
+        std::cout << pizzeria << " ";
+    }
+    for (const auto& pizzeria : maleOnlyVisits) {
+        std::cout << pizzeria << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "Pizzerias visited by Andrey but did not place an order: ";
     for (const auto& pizzeria : andreyVisitsNoOrder) {
         std::cout << pizzeria << " ";
     }
