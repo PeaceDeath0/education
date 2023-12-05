@@ -1,43 +1,99 @@
 #include <iostream>
-#include <string>
+#include <map>
 #include <vector>
 #include <algorithm>
 
-struct PizzaPlace {
-    std::string name;
-    int visitsByMen;
-    int visitsByWomen;
-};
-
 int main() {
-    std::vector<PizzaPlace> pizzaPlaces = {
-        {"Pizza Place 1", 100, 150},
-        {"Pizza Place 2", 120, 80},
-        {"Pizza Place 3", 200, 100},
-        {"Pizza Place 4", 80, 120},
-        {"Pizza Place 5", 150, 150}
+    std::map<std::string, int> pizzaVisits = {
+        {"PizzaHut", 15},
+        {"Dominos", 20},
+        {"PapaJohns", 25},
+        {"LittleCaesars", 30}
     };
-    
-    std::vector<std::string> placesVisitedByMenOnly;
-    std::vector<std::string> placesVisitedByWomenOnly;
-    
-    for (const auto& place : pizzaPlaces) {
-        if (place.visitsByMen > 0 && place.visitsByWomen == 0) {
-            placesVisitedByMenOnly.push_back(place.name);
-        } else if (place.visitsByWomen > 0 && place.visitsByMen == 0) {
-            placesVisitedByWomenOnly.push_back(place.name);
+
+    std::map<std::string, std::string> pizzaGender = {
+        {"PizzaHut", "female"},
+        {"Dominos", "male"},
+        {"PapaJohns", "female"},
+        {"LittleCaesars", "male"}
+    };
+
+    std::map<std::string, bool> pizzaOrders = {
+        {"PizzaHut", false},
+        {"Dominos", true},
+        {"PapaJohns", true},
+        {"LittleCaesars", false}
+    };
+
+    std::map<std::string, float> pizzaPrices = {
+        {"Margherita", 10.0},
+        {"Pepperoni", 12.0},
+        {"Vegetarian", 11.0},
+        {"Supreme", 13.0}
+    };
+
+    std::vector<std::string> femaleVisits;
+    std::vector<std::string> maleVisits;
+    std::vector<std::string> andreyVisitsNoOrder;
+    std::vector<std::string> differentPrices;
+
+    for (auto it = pizzaVisits.begin(); it != pizzaVisits.end(); ++it) {
+        if (pizzaGender[it->first] == "female") {
+            femaleVisits.push_back(it->first);
+        } else {
+            maleVisits.push_back(it->first);
         }
     }
-    
-    std::cout << "Pizza places visited only by men: " << std::endl;
-    for (const auto& place : placesVisitedByMenOnly) {
-        std::cout << place << std::endl;
+
+    std::sort(femaleVisits.begin(), femaleVisits.end());
+    std::sort(maleVisits.begin(), maleVisits.end());
+
+    std::set_intersection(
+        femaleVisits.begin(), femaleVisits.end(),
+        maleVisits.begin(), maleVisits.end(),
+        std::back_inserter(andreyVisitsNoOrder)
+    );
+
+    for (auto it = pizzaOrders.begin(); it != pizzaOrders.end(); ++it) {
+        if (it->second == false) {
+            andreyVisitsNoOrder.push_back(it->first);
+        }
     }
-    
-    std::cout << "Pizza places visited only by women: " << std::endl;
-    for (const auto& place : placesVisitedByWomenOnly) {
-        std::cout << place << std::endl;
+
+    for (auto it = pizzaPrices.begin(); it != pizzaPrices.end(); ++it) {
+        auto found = std::adjacent_find(pizzaPrices.begin(), pizzaPrices.end(), 
+            [it](const std::pair<std::string, float>& p) {
+                return it->second != p.second;
+            });
+
+        if (found != pizzaPrices.end()) {
+            differentPrices.push_back(it->first);
+        }
     }
-    
+
+    std::cout << "Pizzerias visited by more women: ";
+    for (const auto& pizzeria : femaleVisits) {
+        std::cout << pizzeria << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "Pizzerias visited by more men: ";
+    for (const auto& pizzeria : maleVisits) {
+        std::cout << pizzeria << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "Pizzerias visited only by women or men: ";
+    for (const auto& pizzeria : andreyVisitsNoOrder) {
+        std::cout << pizzeria << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "Pizzas with different prices: ";
+    for (const auto& pizza : differentPrices) {
+        std::cout << pizza << " ";
+    }
+    std::cout << std::endl;
+
     return 0;
 }
